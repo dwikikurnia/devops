@@ -1,0 +1,10 @@
+mkdir task work
+echo "test backup" > work/file.txt
+cat > task/backup_v1
+mkdir -p /tmp/backups > ~/backups
+cp -pr ~/work /tmp/backups
+cd /tmp/backups/
+tar cf backup.tar work/
+rm -rf /tmp/backups/work
+echo "Done Backin up the work directory"
+bash task/backup_v1
