@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: dwikikurnia-nodejs
+  name: dwikikurnia-nodejs
+  namespace: dwikikurnia
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: dwikikurnia-nodejs
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: dwikikurnia-nodejs
+    spec:
+      containers:
+      - image: ghcr.io/benc-uk/nodejs-demoapp:latest
+        name: node
+        resources:
+                limits:
+                        cpu: 1000m
+                        memory: 1Gi
+                requests:
+                        cpu: 100m
+                        memory: 500Mi
+status: {}
+

@@ -1,0 +1,22 @@
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+        name: dwikikurnia-ingress
+        namespace: dwikikurnia
+        annotations:
+                ingress.kubernetes.io/rewrite-target: /$1
+                kubernetes.io/ingress.class: nginx
+spec:
+        rules:
+                - host: k8s.dwikikurnia.me
+                  http:
+                          paths:
+                                  - path: /
+                                    backend:
+                                            serviceName: dwikikurnia-nodejs
+                                            servicePort: 3000
+                                  - path: /tomcat
+                                    backend:
+                                            serviceName: tomcat
+                                            servicePort: 8080     

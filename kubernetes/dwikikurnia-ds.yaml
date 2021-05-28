@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  creationTimestamp: null
+  labels:
+    app: dwikikurnia-ds
+  name: dwikikurnia-ds
+  namespace: dwikikurnia
+spec:
+  selector:
+    matchLabels:
+      app: dwikikurnia-ds
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: dwikikurnia-ds
+    spec:
+      containers:
+      - image: alpine:3.13
+        command:
+        - /bin/sh
+        - -c
+        - while true; do cat /proc/sys/kernel/hostname; sleep 1; echo -----; done
+        name: alpine
+        stdin: true
+        tty: true
+        resources: {}

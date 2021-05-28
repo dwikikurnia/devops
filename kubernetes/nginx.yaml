@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+        name: dwikikurnia-nginx-pod
+        labels:
+                app: nginx
+spec:
+        containers:
+                - name: dwikikurnia-containers-02
+                  image: nginx:1.20.0-alpine
+                  resources: 
+                        requests:
+                                cpu: 200m
+                                memory: 500Mi
+                        limits:
+                                cpu: 200m
+                                memory: 500Mi
+                  ports: 
+                        - containerPort: 80
