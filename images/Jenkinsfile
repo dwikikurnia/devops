@@ -1,0 +1,67 @@
+def IMAGE_NAME = 'tfans'
+def IMAGE_VERSION = '1.0'
+def DOCKER_BASE_REGISTRY = 'registry.gitlab.com'
+def DOCKER_IMAGE_REGISTRY = 'purwadhika-telkomsel/cicd/jenkins/antrusd'
+
+pipeline {
+    agent none
+
+    stages {
+       stage('Build Docker Images') {
+            agent {
+                kubernetes {
+                    label 'dind-node'
+                }
+            }
+
+            steps {
+                container ('dind-container') {
+                    dir('images') {
+                        sh "docker build --network host -t ${DOCKER_BASE_REGISTRY}/${DOCKER_IMAGE_REGISTRY}/${IMAGE_NAME}:${IMAGE_VERSION} ."
+
+                        withCredentials([usernamePassword(credentialsId: 'GITLAB_DT', passwordVariable: 'GDT_PASSWORD', usernameVariable: 'GDT_USER')]) {
+                            sh "docker login  -u '${GDT_USER}' -p '${GDT_PASSWORD}' ${DOCKER_BASE_REGISTRY}"
+                        }
+
+                        sh "docker push ${DOCKER_BASE_REGISTRY}/${DOCKER_IMAGE_REGISTRY}/${IMAGE_NAME}:${IMAGE_VERSION}"
+                    }
+                }
+            }
+        }
+        
+        stage('Terraform Execution') {
+            agent {
+                kubernetes {
+                    yaml """
+kind: Pod
+metadata:
+  name: terraform-agent
+  namespace: antrusd
+spec:
+  imagePullSecrets:
+  - name: gitlab-registry
+  containers:
+  - name: ${IMAGE_NAME}
+    image: ${DOCKER_BASE_REGISTRY}/${DOCKER_IMAGE_REGISTRY}/${IMAGE_NAME}:${IMAGE_VERSION}
+    imagePullPolicy: Always
+    command:
+    - sleep
+    - 9999999
+    tty: true
+    stdin: true
+  restartPolicy: Never
+"""
+                }
+            }
+
+            steps {
+                container ("${IMAGE_NAME}") {
+                    dir ('terraform') {
+                        sh "terraform plan"
+                    }
+                }
+            }
+        }
+    }
+}
+
